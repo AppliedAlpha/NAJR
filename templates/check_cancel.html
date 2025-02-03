@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check/Cancel Reservation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin-top: 50px;
+            text-align: center;
+        }
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        input {
+            padding: 10px;
+            width: 300px;
+            font-size: 1rem;
+        }
+        .btn {
+            font-size: 1.2rem;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background-color: #45a049;
+        }
+        .reservation-details {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f4f4f4;
+            border-radius: 10px;
+        }
+        .cancel-btn {
+            background-color: #f44336;
+            color: white;
+        }
+        .cancel-btn:hover {
+            background-color: #e53935;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Check or Cancel Your Reservation</h1>
+
+    <form method="POST">
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" name="email" id="email" required>
+        </div>
+
+        <div class="form-group">
+            <label for="phone">Phone Number:</label>
+            <input type="text" name="phone" id="phone" required>
+        </div>
+
+        <button type="submit" class="btn">Check Reservation</button>
+    </form>
+
+    {% if reservation %}
+    <div class="reservation-details">
+        <p><strong>Seat Label:</strong> {{ reservation.seat.seat_label }}</p>
+        <p><strong>Name:</strong> {{ reservation.name }}</p>
+        <p><strong>Email:</strong> {{ reservation.email }}</p>
+        <p><strong>Phone:</strong> {{ reservation.phone }}</p>
+
+        <form action="{{ url_for('cancel_reservation', reservation_id=reservation.id) }}" method="POST">
+            <button type="submit" class="btn cancel-btn">Cancel Reservation</button>
+        </form>
+    </div>
+    {% endif %}
+
+</body>
+</html>

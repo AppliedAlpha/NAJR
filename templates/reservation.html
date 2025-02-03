@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reserve a Seat</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin-top: 50px;
+            text-align: center;
+        }
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+        .seats {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .seat {
+            padding: 15px;
+            border: 2px solid #4CAF50;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: #333;
+        }
+        .reserved {
+            background-color: #f44336;
+            color: white;
+            cursor: not-allowed;
+        }
+        .available {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .seat:hover {
+            background-color: #45a049;
+        }
+        form {
+            margin-top: 30px;
+            text-align: left;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        input {
+            padding: 10px;
+            width: 300px;
+            font-size: 1rem;
+        }
+        .btn {
+            font-size: 1.2rem;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Reserve a Seat</h1>
+
+    <div class="seats">
+        {% for seat in seats %}
+            <div class="seat {% if seat.status %}reserved{% else %}available{% endif %}" 
+                 {% if seat.status %} disabled {% endif %} data-seat="{{ seat.seat_label }}">
+                {{ seat.seat_label }}
+            </div>
+        {% endfor %}
+    </div>
+
+    <form method="POST">
+        <div class="form-group">
+            <label for="seat_label">Seat:</label>
+            <input type="text" name="seat_label" id="seat_label" readonly required>
+        </div>
+
+        <div class="form-group">
+            <label for="name">Full Name:</label>
+            <input type="text" name="name" id="name" required>
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" name="email" id="email" required>
+        </div>
+
+        <div class="form-group">
+            <label for="phone">Phone Number:</label>
+            <input type="text" name="phone" id="phone" required>
+        </div>
+
+        <div class="form-group">
+            <input type="checkbox" name="consent" id="consent" required>
+            <label for="consent">Consent to the collection and use of personal information</label>
+        </div>
+
+        <button type="submit" class="btn">Reserve Seat</button>
+    </form>
+
+</body>
+</html>
