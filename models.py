@@ -9,7 +9,7 @@ class Seat(db.Model):
     is_reserved = db.Column(db.Boolean, default=False)  # False = Available, True = Reserved
 
     def __repr__(self):
-        return f"<Seat {self.seat_label}, Reserved: {self.is_reserved}>"
+        return f"<Seat {self.seat_label}, Reserved: {self.status}>"
 
 class Reservation(db.Model):
     id = db.Column(db.Integer, primary_key=True)

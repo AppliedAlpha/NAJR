@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail, Message
 from models import db, Seat, Reservation
+import os
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///seats.db'
@@ -9,11 +10,13 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'your_secret_key'
 
 # Flask-Mail Config
-app.config['MAIL_SERVER'] = 'smtp.example.com'  # Replace with actual SMTP server
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'your_email@example.com'
-app.config['MAIL_PASSWORD'] = 'your_password'
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'  # Replace with actual SMTP server
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
+app.config['MAIL_USERNAME'] = 'clusterfriends@gmail.com'
+app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
+print(os.getenv('MAIL_PASSWORD'))
 
 db.init_app(app)
 mail = Mail(app)
@@ -32,20 +35,20 @@ def reserve():
         email = request.form['email']
         phone = request.form['phone']
 
-        seat = Seat.query.filter_by(seat_label=seat_label, status=False).first()
+        seat = Seat.query.filter_by(seat_label=seat_label, is_reserved=False).first()
         
         if not seat:
             flash('Seat is already reserved or does not exist.', 'danger')
             return redirect(url_for('reserve'))
         
         new_reservation = Reservation(seat_id=seat.id, name=name, email=email, phone=phone)
-        seat.status = True  # Mark seat as reserved
+        seat.is_reserved = True  # Mark seat as reserved
         db.session.add(new_reservation)
         db.session.commit()
 
         # Send Email Notification
         msg = Message('Seat Reservation Confirmation',
-                      sender='your_email@example.com',
+                      sender='clusterfriends@gmail.com',
                       recipients=[email])
         msg.body = f"Hello {name},\n\nYour seat {seat_label} has been reserved successfully!"
         mail.send(msg)
@@ -53,7 +56,7 @@ def reserve():
         flash('Reservation successful! A confirmation email has been sent.', 'success')
         return redirect(url_for('index'))
     
-    seats = Seat.query.filter_by(status=False).all()
+    seats = Seat.query.filter_by(is_reserved=False).all()
     return render_template('reservation.html', seats=seats)
 
 # Check & Cancel Page
@@ -63,7 +66,7 @@ def check_reservation():
         email = request.form['email']
         phone = request.form['phone']
 
-        reservation = Reservation.query.filter_by(email=email, phone=phone, status=True).first()
+        reservation = Reservation.query.filter_by(email=email, phone=phone, is_active=True).first()
         if not reservation:
             flash('No active reservation found with provided details.', 'danger')
             return redirect(url_for('check_reservation'))
@@ -75,9 +78,9 @@ def check_reservation():
 @app.route('/cancel/<int:reservation_id>', methods=['POST'])
 def cancel_reservation(reservation_id):
     reservation = Reservation.query.get(reservation_id)
-    if reservation and reservation.status:
-        reservation.status = False
-        reservation.seat.status = False  # Mark seat as available again
+    if reservation and reservation.is_active:
+        reservation.is_active = False
+        reservation.seat.is_reserved = False  # Mark seat as available again
         db.session.commit()
         flash('Reservation canceled successfully.', 'success')
     else:

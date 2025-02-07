@@ -64,14 +64,33 @@
         }
     </style>
 </head>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const seats = document.querySelectorAll(".seat.available");
+        const seatInput = document.getElementById("seat_label");
+
+        seats.forEach(seat => {
+            seat.addEventListener("click", function () {
+                // Remove selection from previously selected seat
+                document.querySelectorAll(".seat").forEach(s => s.style.border = "2px solid #4CAF50");
+                
+                // Mark the clicked seat
+                this.style.border = "3px solid black";
+                
+                // Update input field with selected seat label
+                seatInput.value = this.getAttribute("data-seat");
+            });
+        });
+    });
+</script>
 <body>
 
     <h1>Reserve a Seat</h1>
 
     <div class="seats">
         {% for seat in seats %}
-            <div class="seat {% if seat.status %}reserved{% else %}available{% endif %}" 
-                 {% if seat.status %} disabled {% endif %} data-seat="{{ seat.seat_label }}">
+            <div class="seat {% if seat.is_reserved %}reserved{% else %}available{% endif %}" 
+                 {% if seat.is_reserved %} disabled {% endif %} data-seat="{{ seat.seat_label }}">
                 {{ seat.seat_label }}
             </div>
         {% endfor %}
