@@ -6,11 +6,18 @@ with app.app_context():
     # Create the database tables if they don't exist
     db.create_all()
 
+    db.session.query(Seat).delete() # Remove all existing seats
+
     # Insert some test seats
-    seat_labels = [
-        "A-1열-1번", "A-1열-2번", "A-1열-3번", 
-        "A-2열-1번", "A-2열-2번", "A-2열-3번"
-    ]
+    seat_labels = [f"{region}-{row}열-{num}번" for region in ("A", "B", "C") for row in range(1, 10) for num in range(1, 10)]
+
+    # Remove some seats that don't exist
+    for num in range(1, 10):
+        seat_labels.remove(f"B-9열-{num}번")
+    seat_labels.remove("A-9열-1번")
+    seat_labels.remove("A-9열-2번")
+    seat_labels.remove("C-9열-8번")
+    seat_labels.remove("C-9열-9번")
 
     for label in seat_labels:
         existing_seat = Seat.query.filter_by(seat_label=label).first()
@@ -20,6 +27,7 @@ with app.app_context():
 
     db.session.commit()
 
+    '''
     # Fetch some seats to assign reservations
     seat1 = Seat.query.filter_by(seat_label="A-1열-1번").first()
     seat2 = Seat.query.filter_by(seat_label="A-1열-2번").first()
@@ -48,4 +56,5 @@ with app.app_context():
         db.session.add(reservation2)
         db.session.commit()
 
+    '''
     print("Test data inserted successfully!")

@@ -16,7 +16,6 @@ app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 app.config['MAIL_USERNAME'] = 'clusterfriends@gmail.com'
 app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
-print(os.getenv('MAIL_PASSWORD'))
 
 db.init_app(app)
 mail = Mail(app)
@@ -56,7 +55,7 @@ def reserve():
         flash('Reservation successful! A confirmation email has been sent.', 'success')
         return redirect(url_for('index'))
     
-    seats = Seat.query.filter_by(is_reserved=False).all()
+    seats = Seat.query.all()
     return render_template('reservation.html', seats=seats)
 
 # Check & Cancel Page

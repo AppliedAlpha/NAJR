@@ -84,6 +84,14 @@
     });
 </script>
 <body>
+    <!-- Message Flashing -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <script>
+                alert("{{ messages[-1][1] }}");
+            </script>
+        {% endif %}
+    {% endwith %}
 
     <h1>Reserve a Seat</h1>
 
