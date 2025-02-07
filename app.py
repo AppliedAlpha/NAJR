@@ -49,7 +49,11 @@ def reserve():
         msg = Message('Seat Reservation Confirmation',
                       sender='clusterfriends@gmail.com',
                       recipients=[email])
-        msg.body = f"Hello {name},\n\nYour seat {seat_label} has been reserved successfully!"
+        # msg.body = f"Hello {name},\n\nYour seat {seat_label} has been reserved successfully!"
+        msg.html = f"""
+            <p>Hello {name},</p><p>Your seat {seat_label} has been reserved successfully!</p>
+            <img src="https://housewarm.applied.moe/hoonpago_house_mobile.jpg" width=300 alt="Seat Map">
+        """
         mail.send(msg)
 
         flash('Reservation successful! A confirmation email has been sent.', 'success')

@@ -19,10 +19,20 @@ with app.app_context():
     seat_labels.remove("C-9열-8번")
     seat_labels.remove("C-9열-9번")
 
+    region = {'A': 109, 'B': 555, 'C': 997}
+
+
     for label in seat_labels:
         existing_seat = Seat.query.filter_by(seat_label=label).first()
         if not existing_seat:  # Prevent duplicates
-            seat = Seat(seat_label=label, is_reserved=False)  # All seats start as available
+            _x = 0
+            _y = 0
+
+            seat_num = label.split("-")
+            _x += region[seat_num[0]] + (int(seat_num[2][0]) - 1) * 39
+            _y += 310 + (int(seat_num[1][0]) - 1) * 60
+
+            seat = Seat(seat_label=label, is_reserved=False, x=_x, y=_y)  # All seats start as available
             db.session.add(seat)
 
     db.session.commit()

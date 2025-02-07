@@ -14,43 +14,68 @@
             font-size: 2rem;
             margin-bottom: 20px;
         }
-        .seats {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 15px;
-            margin-bottom: 30px;
+        
+        /* Scrollable seat container */
+        .seat-container {
+            position: relative;
+            width: 731px;  /* Adjust as needed */
+            height: 500px; /* Adjust as needed */
+            overflow: auto;
+            margin: 0 auto 30px auto;
+            border: 2px solid #ccc;
         }
+
+        .seat-map {
+            position: absolute;
+            min-width: 1461px;
+            min-height: 1000px;
+            display: block;
+        }
+        
+        /* Seat buttons */
         .seat {
-            padding: 15px;
+            position: absolute;
+            width: 38px;
+            height: 32px;
             border: 2px solid #4CAF50;
+            background-color: #4CAF50;
+            color: white;
+            font-size: auto;
             cursor: pointer;
-            font-size: 1.2rem;
-            color: #333;
+            text-align: center;
+            line-height: 32px;
+            border-radius: 5px;
+            outline: #000;
         }
+
+        /* Reserved seats */
         .reserved {
             background-color: #f44336;
             color: white;
             cursor: not-allowed;
         }
-        .available {
-            background-color: #4CAF50;
-            color: white;
-        }
+
         .seat:hover {
             background-color: #45a049;
         }
+
+        /* Form styling */
         form {
             margin-top: 30px;
             text-align: left;
+            display: inline-block;
         }
+
         .form-group {
             margin-bottom: 15px;
         }
+
         input {
             padding: 10px;
             width: 300px;
             font-size: 1rem;
         }
+
         .btn {
             font-size: 1.2rem;
             padding: 10px 20px;
@@ -59,6 +84,7 @@
             border: none;
             cursor: pointer;
         }
+
         .btn:hover {
             background-color: #45a049;
         }
@@ -95,12 +121,20 @@
 
     <h1>Reserve a Seat</h1>
 
-    <div class="seats">
+    <div class="seat-container">
+        <img src="{{ url_for('static', filename='images/seats.jpg') }}" alt="Seat Map" class="seat-map">
+
         {% for seat in seats %}
-            <div class="seat {% if seat.is_reserved %}reserved{% else %}available{% endif %}" 
-                 {% if seat.is_reserved %} disabled {% endif %} data-seat="{{ seat.seat_label }}">
-                {{ seat.seat_label }}
-            </div>
+        <script>
+            console.log("{{ seat.seat_label }} > x: {{ seat.x }}, y: {{ seat.y }}");
+        </script>
+            <button class="seat {% if seat.is_reserved %}reserved{% else %}available{% endif %}" 
+                {% if seat.is_reserved %} disabled {% endif %}
+                data-seat="{{ seat.seat_label }}"
+                style="top: {{ seat.y }}px; left: {{ seat.x }}px;">
+                
+                {{ seat.seat_label[2] }}-{{ seat.seat_label[5] }}
+            </button>
         {% endfor %}
     </div>
 

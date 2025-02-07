@@ -7,6 +7,8 @@ class Seat(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     seat_label = db.Column(db.String(50), unique=True, nullable=False)
     is_reserved = db.Column(db.Boolean, default=False)  # False = Available, True = Reserved
+    x = db.Column(db.Integer)
+    y = db.Column(db.Integer)
 
     def __repr__(self):
         return f"<Seat {self.seat_label}, Reserved: {self.status}>"
@@ -19,6 +21,7 @@ class Reservation(db.Model):
     phone = db.Column(db.String(20), nullable=False)
     reserved_at = db.Column(db.DateTime, default=datetime.utcnow)
     is_active = db.Column(db.Boolean, default=True)  # True = Active, False = Canceled
+    rooting_for = db.Column(db.String(50), nullable=True)
 
     seat = db.relationship('Seat', backref=db.backref('reservation', lazy=True))
 
