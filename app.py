@@ -60,7 +60,8 @@ def reserve():
         return redirect(url_for('index'))
     
     seats = Seat.query.all()
-    return render_template('reservation.html', seats=seats)
+    available_seats = len([seat for seat in seats if not seat.is_reserved])
+    return render_template('reservation.html', available_seats=available_seats, seats=seats)
 
 # Check & Cancel Page
 @app.route('/check', methods=['GET', 'POST'])
@@ -94,4 +95,4 @@ def cancel_reservation(reservation_id):
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()  # Create tables if they don't exist
-    app.run(debug=True)
+    app.run(port=5724, debug=True)

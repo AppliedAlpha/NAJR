@@ -14,19 +14,40 @@
     <style>
         body {
             font-family: 'Nanum Gothic', sans-serif;
-            margin-top: 50px;
             text-align: center;
+            background: url("{{ url_for('static', filename='images/bg2.jpg') }}") no-repeat center center/cover;
+            position: relative;
         }
-        h1 {
-            font-size: 2rem;
-            margin-bottom: 20px;
+
+        .title {
+            font-weight: bold;
+            margin-top: 20px;
+            margin-bottom: 10px;
         }
         
-        /* Scrollable seat container */
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: -1;
+        }
+        
+        .content-box {
+            background: rgba(255, 255, 255, 0.5);
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 90%;
+            margin: auto;
+        }
+        
         .seat-container {
             position: relative;
-            width: 731px;  /* Adjust as needed */
-            height: 500px; /* Adjust as needed */
+            width: 90%;
+            max-width: 1400px;
+            height: 500px;
             overflow: auto;
             margin: 0 auto 30px auto;
             border: 2px solid #ccc;
@@ -38,62 +59,73 @@
             min-height: 1000px;
             display: block;
         }
+
+        .seat-left {
+            position: relative;
+            text-align: right;
+            font-weight: 700;
+            padding-right: 10px;
+            width: 90%;
+            max-width: 1400px;
+        }
         
-        /* Seat buttons */
         .seat {
             position: absolute;
             width: 38px;
             height: 32px;
-            border: 2px solid #4CAF50;
-            background-color: #4CAF50;
-            color: white;
-            font-size: auto;
-            cursor: pointer;
             text-align: center;
-            line-height: 32px;
+
+            border: 2px solid white;
             border-radius: 5px;
-            outline: #000;
+            font-size: 12px;
         }
 
-        /* Reserved seats */
-        .reserved {
-            background-color: #f44336;
+        .available {
+            background-color: #9c4d39;
             color: white;
+            cursor: pointer;
+        }
+
+        .selected {
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+
+        .reserved {
+            background-color: #666;
+            color: #999;
             cursor: not-allowed;
         }
 
-        .seat:hover {
-            background-color: #45a049;
+        .form-container {
+            background-color: #eee;
+            border: 3px solid black;
+            border-radius: 20px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+            box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
         }
 
-        /* Form styling */
-        form {
-            margin-top: 30px;
-            text-align: left;
-            display: inline-block;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        input {
+        .scroll-box {
+            width: 100%;
+            height: 200px;
+            overflow-y: scroll;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
             padding: 10px;
-            width: 300px;
-            font-size: 1rem;
+            background: white;
         }
 
-        .btn {
-            font-size: 1.2rem;
-            padding: 10px 20px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
+        .seat-remain {
+            color: #148141;
         }
 
-        .btn:hover {
-            background-color: #45a049;
+        .seat-none {
+            color: #a11313;
         }
     </style>
 </head>
@@ -104,14 +136,10 @@
 
         seats.forEach(seat => {
             seat.addEventListener("click", function () {
-                // Remove selection from previously selected seat
-                document.querySelectorAll(".seat").forEach(s => s.style.border = "2px solid #4CAF50");
+                document.querySelectorAll(".seat").forEach(s => s.classList.remove("selected"));
                 
-                // Mark the clicked seat
-                this.style.border = "3px solid black";
-                
-                // Update input field with selected seat label
-                seatInput.value = this.getAttribute("data-seat");
+                this.classList.add("selected");
+                seatInput.innerText = this.getAttribute("data-seat");
             });
         });
     });
@@ -126,53 +154,58 @@
         {% endif %}
     {% endwith %}
 
-    <h1>좌석 예약하기</h1>
+    <div class="overlay"></div>
+    <div class="container content-box mt-5 p-4">
+        <h1 class="title text-center">좌석 예약하기</h1>
 
-    <div class="seat-container">
-        <img src="{{ url_for('static', filename='images/seats.jpg') }}" alt="Seat Map" class="seat-map">
+        <div style="display: flex; flex-direction: row; align-items: center; justify-content: center;">
+            <p class="seat-left">
+                남은 좌석 : <span class="color: {% if available_seats >= 115 %} seat-remain {% else %} seat-none {% endif %}">{{ available_seats }} </span>/ {{ seats|length }}
+            </p>
+        </div>
 
-        {% for seat in seats %}
-        <script>
-            console.log("{{ seat.seat_label }} > x: {{ seat.x }}, y: {{ seat.y }}");
-        </script>
-            <button class="seat {% if seat.is_reserved %}reserved{% else %}available{% endif %}" 
-                {% if seat.is_reserved %} disabled {% endif %}
-                data-seat="{{ seat.seat_label }}"
-                style="top: {{ seat.y }}px; left: {{ seat.x }}px;">
-                
-                {{ seat.seat_label[2] }}-{{ seat.seat_label[5] }}
-            </button>
-        {% endfor %}
+        <div class="seat-container">
+            <img src="{{ url_for('static', filename='images/seats.jpg') }}" alt="Seat Map" class="seat-map">
+            {% for seat in seats %}
+                <button class="seat {% if seat.is_reserved %}reserved{% else %}available{% endif %}" 
+                    data-seat="{{ seat.seat_label }}"
+                    style="top: {{ seat.y }}px; left: {{ seat.x }}px;">
+                    {{ seat.seat_label[2] }}-{{ seat.seat_label[5] }}
+                </button>
+            {% endfor %}
+        </div>
+
+        <div class="form-container">
+            <form method="POST">
+                <div class="mb-3">
+                    <label for="seat_label" class="form-label" style="font-weight: bold">예약할 좌석 번호</label>
+                    <div class="form-control" readonly id="seat_label" style="font-weight: bold; color: #4CAF50"></div>
+                </div>
+                <div class="mb-3">
+                    <label for="name" class="form-label">이름</label>
+                    <input type="text" name="name" id="name" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">이메일 주소</label>
+                    <input type="email" name="email" id="email" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label for="phone" class="form-label">전화번호</label>
+                    <input type="text" name="phone" id="phone" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <div class="scroll-box">
+                        개인정보 수집 및 이용에 대한 안내사항이 여기에 표시됩니다.
+                    </div>
+                </div>
+                <div class="mb-3 form-check">
+                    <input type="checkbox" name="consent" id="consent" class="form-check-input" required>
+                    <label for="consent" class="form-check-label">동의합니다</label>
+                </div>
+                <button type="submit" class="btn btn-success">좌석 예약하기</button>
+            </form>
+        </div>
     </div>
-
-    <form method="POST">
-        <div class="form-group">
-            <label for="seat_label">Seat:</label>
-            <input type="text" name="seat_label" id="seat_label" readonly required>
-        </div>
-
-        <div class="form-group">
-            <label for="name">Full Name:</label>
-            <input type="text" name="name" id="name" required>
-        </div>
-
-        <div class="form-group">
-            <label for="email">Email:</label>
-            <input type="email" name="email" id="email" required>
-        </div>
-
-        <div class="form-group">
-            <label for="phone">Phone Number:</label>
-            <input type="text" name="phone" id="phone" required>
-        </div>
-
-        <div class="form-group">
-            <input type="checkbox" name="consent" id="consent" required>
-            <label for="consent">Consent to the collection and use of personal information</label>
-        </div>
-
-        <button type="submit" class="btn">Reserve Seat</button>
-    </form>
 
 </body>
 </html>
