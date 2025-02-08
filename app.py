@@ -87,6 +87,11 @@ def check_reservation():
         name = request.form['name']
         phone = request.form['phone']
 
+        if name == os.getenv('ADMIN_NAME') and phone == os.getenv('ADMIN_PHONE'):
+            seats = Seat.query.all()
+            reservations = Reservation.query.filter_by(is_active=True).all()
+            return render_template('rev_list.html', seats=seats, reservations=reservations)
+
         reservation = Reservation.query.filter_by(name=name, phone=phone, is_active=True).first()
         if not reservation:
             flash('[!] 해당 정보로 존재하는 좌석 예약 이력이 없습니다.', 'danger')
@@ -98,20 +103,25 @@ def check_reservation():
     seats = Seat.query.all()
     return render_template('check_cancel.html', seats=seats, reservation=None)
 
-@app.route('/cancel/<int:reservation_id>', methods=['POST'])
-def cancel_reservation(reservation_id):
+@app.route('/cancel/<int:reservation_id>/<int:is_admin>', methods=['POST'])
+def cancel_reservation(reservation_id, is_admin):
     reservation = Reservation.query.get(reservation_id)
     if reservation and reservation.is_active:
         reservation.is_active = False
-        reservation.seat.is_reserved = False  # Mark seat as available again
+        reservation.seat.is_reserved = False
         db.session.commit()
         flash('[!!] 예약을 성공적으로 취소했습니다.', 'success')
     else:
         flash('[!] 예약을 찾을 수 없거나 이미 취소되었습니다.', 'danger')
 
+    if is_admin:
+        seats = Seat.query.all()
+        reservations = Reservation.query.filter_by(is_active=True).all()
+        return render_template('rev_list.html', seats=seats, reservations=reservations)
+    
     return redirect(url_for('check_reservation'))
 
 if __name__ == '__main__':
     with app.app_context():
-        db.create_all()  # Create tables if they don't exist
+        db.create_all() 
     app.run(port=5724, debug=True)
