@@ -40,6 +40,10 @@
             font-size: 14px;
             color: #888;
         }
+        .seat-number {
+            font-weight: 700;
+            color: blue;
+        }
     </style>
 </head>
 <body>
@@ -56,7 +60,7 @@
 
         <div class="info">
             <p><strong>예약자:</strong> {{ name }}</p>
-            <p><strong>좌석 번호:</strong> {{ seat_label }}</p>
+            <p><strong>좌석 번호:</strong><span class="seat-number"> {{ seat_label }}</span></p>
         </div>
 
         <p>🎟 <strong>공연 시작 10분 전까지 착석을 완료해 주세요.</strong></p>

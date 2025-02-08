@@ -73,7 +73,7 @@ def reserve():
         mail.send(msg)
 
         print(f"Reservation successful! A confirmation email has been sent to {email}.")
-        flash('[!!] 예약이 성공했습니다. 입력한 이메일로 예약 완료 메일이 발송되었습니다.', 'success')
+        flash('[!!] 예약이 성공했습니다. 이메일로 예약 완료 메일이 발송되었습니다.', 'success')
         return redirect(url_for('index'))
     
     seats = Seat.query.all()

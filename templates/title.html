@@ -104,23 +104,29 @@
     <div class="background-container">
         <img src="/static/images/bg1.jpg" class="active">
         <img src="/static/images/bg2.jpg">
+        <img src="/static/images/bg3.jpg">
     </div>
-    
-    <!-- Message Flashing -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            <script>
-                alert("{{ messages[-1][1] }}");
-            </script>
-        {% endif %}
-    {% endwith %}
     
     <!-- Centered Content -->
     <div class="content-box">
         <h1>나름자리</h1>
-        <a href="{{ url_for('reserve') }}" class="btn btn-success btn-lg btn-custom">좌석 예약하기</a>
-        <a href="{{ url_for('check_reservation') }}" class="btn btn-outline-light btn-lg btn-custom">예약 확인/취소하기</a>
-        <button class="btn btn-primary btn-lg btn-custom" data-bs-toggle="modal" data-bs-target="#timetableModal">일정표 확인</button>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="container mt-3">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <a href="{{ url_for('reserve') }}" class="btn btn-warning btn-lg btn-custom">좌석 예약하기</a>
+        <a href="{{ url_for('check_reservation') }}" class="btn btn-success btn-lg btn-custom">예약 확인/취소하기</a>
+        <button class="btn btn-primary btn-lg btn-custom" data-bs-toggle="modal" data-bs-target="#timetableModal">포스터 보기</button>
     </div>
     
     <!-- Timetable Modal -->
@@ -128,14 +134,14 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="timetableModalLabel">Event Timetable</h5>
+                    <h5 class="modal-title" id="timetableModalLabel">포스터</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <p>추가 예정</p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
                 </div>
             </div>
         </div>
@@ -143,7 +149,7 @@
     
     <!-- Footer -->
     <footer>
-        &copy; 2025. '나름자리' By Cluster All rights reserved.
+        &copy; 2025. '나름자리' By Jihun Kim, Cluster All rights reserved.
     </footer>
     
     <!-- Bootstrap JS -->
