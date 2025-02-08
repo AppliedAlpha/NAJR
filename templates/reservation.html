@@ -26,7 +26,7 @@
         }
         
         .overlay {
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
@@ -127,35 +127,34 @@
         .seat-none {
             color: #a11313;
         }
+
+        .ct-margin {
+            margin-top: 50px;
+            margin-bottom: 50px;
+        }
     </style>
 </head>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const seats = document.querySelectorAll(".seat.available");
         const seatInput = document.getElementById("seat_label");
+        const seatDisplay = document.getElementById("seat_label_display");
 
         seats.forEach(seat => {
             seat.addEventListener("click", function () {
                 document.querySelectorAll(".seat").forEach(s => s.classList.remove("selected"));
                 
                 this.classList.add("selected");
-                seatInput.innerText = this.getAttribute("data-seat");
+                seatInput.value = this.getAttribute("data-seat");
+                seatInput.textContent = this.getAttribute("data-seat");
+                seatDisplay.textContent = this.getAttribute("data-seat");
             });
         });
     });
 </script>
 <body>
-    <!-- Message Flashing -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            <script>
-                alert("{{ messages[-1][1] }}");
-            </script>
-        {% endif %}
-    {% endwith %}
-
     <div class="overlay"></div>
-    <div class="container content-box mt-5 p-4">
+    <div class="ct-margin container content-box">
         <h1 class="title text-center">좌석 예약하기</h1>
 
         <div style="display: flex; flex-direction: row; align-items: center; justify-content: center;">
@@ -163,6 +162,19 @@
                 남은 좌석 : <span class="color: {% if available_seats >= 115 %} seat-remain {% else %} seat-none {% endif %}">{{ available_seats }} </span>/ {{ seats|length }}
             </p>
         </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="container mt-3">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
 
         <div class="seat-container">
             <img src="{{ url_for('static', filename='images/seats.jpg') }}" alt="Seat Map" class="seat-map">
@@ -176,10 +188,11 @@
         </div>
 
         <div class="form-container">
-            <form method="POST">
+            <form method="POST" onsubmit="showLoading(event)">
                 <div class="mb-3">
                     <label for="seat_label" class="form-label" style="font-weight: bold">예약할 좌석 번호</label>
-                    <div class="form-control" readonly id="seat_label" style="font-weight: bold; color: #4CAF50"></div>
+                    <div class="form-control" readonly id="seat_label_display" style="font-weight: bold; color: #4CAF50"></div>
+                    <input type="hidden" name="seat_label" id="seat_label">
                 </div>
                 <div class="mb-3">
                     <label for="name" class="form-label">이름</label>
@@ -192,20 +205,110 @@
                 <div class="mb-3">
                     <label for="phone" class="form-label">전화번호</label>
                     <input type="text" name="phone" id="phone" class="form-control" required>
+                    <small class="text-danger d-none" id="phone-error">[!] 전화번호를 올바르게 숫자로만 입력해주세요.</small>
+
+                    <script>
+                        document.getElementById("phone").addEventListener("input", function (event) {
+                            let input = this.value.replace(/\D/g, ""); // Remove non-numeric characters
+                            if (input.length > 12) input = input.slice(0, 12); // Limit to 12 digits
+                            this.value = input;
+                        
+                            // Validation message
+                            const errorMsg = document.getElementById("phone-error");
+                            if (input.length < 8 || input.length > 12) {
+                                errorMsg.classList.remove("d-none");
+                            } else {
+                                errorMsg.classList.add("d-none");
+                            }
+                        });
+                        </script>
+                </div>
+                <div class="mb-3">
+                    <label for="rooting_for" class="form-label">응원하는 아티스트</label>
+                    <input type="text" name="rooting_for" id="rooting_for" class="form-control">
                 </div>
                 <div class="mb-3">
                     <div class="scroll-box">
-                        개인정보 수집 및 이용에 대한 안내사항이 여기에 표시됩니다.
+                        <b>[개인정보 수집과 이용에 대한 동의]</b><br /><br />
+                        - 개인정보 수집 및 이용 목적 : 좌석 예약을 위한 개인정보 수집 및 이용<br />
+                        - 수집하는 개인정보 항목 : 이름, 이메일 주소, 전화번호<br />
+                        - 개인정보 보유 및 이용 기간 : 좌석 예약일로부터 90일간 보관 후 삭제<br />
+                        - 동의 거부 권리 : 귀하는 동의를 거부할 수 있으나, 동의하지 않을 시 좌석 예약이 불가능함을 알려드립니다.<br />
                     </div>
                 </div>
                 <div class="mb-3 form-check">
                     <input type="checkbox" name="consent" id="consent" class="form-check-input" required>
-                    <label for="consent" class="form-check-label">동의합니다</label>
+                    <label for="consent" class="form-check-label">개인정보 수집과 이용에 동의합니다.</label>
                 </div>
                 <button type="submit" class="btn btn-success">좌석 예약하기</button>
             </form>
         </div>
     </div>
+    
+    <!-- Loading Overlay -->
+    <div id="loading-overlay">
+        <div class="loading-spinner"></div>
+        <p>예약을 진행하는 중...</p>
+    </div>
 
+    <style>
+        /* Loading overlay styles */
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            font-size: 1.5rem;
+            z-index: 9999;
+            display: none;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #4CAF50;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+
+    <script>
+        function showLoading(event) {
+            console.log('showLoading');
+            let seat = document.getElementById('seat_label_display').innerText;
+            if (!seat) {
+                alert('좌석을 선택해주세요.');
+                event.preventDefault(); // Stop form submission
+                return false;
+            }
+
+            let overlay = document.getElementById('loading-overlay');
+            overlay.style.display = 'flex';
+            console.log("Overlay should be visible now.");
+
+            setTimeout(() => {
+                document.querySelectorAll('input, button').forEach(el => el.disabled = true);
+            }, 150);
+        }
+
+        window.onload = function() {
+            document.getElementById('loading-overlay').style.display = 'none';
+            document.querySelectorAll('input, button').forEach(el => el.disabled = false);
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

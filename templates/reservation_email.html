@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>[나름자리] {{ name }} 님의 좌석 예약이 완료되었습니다.</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            color: #333;
+            text-align: center;
+        }
+        .info {
+            background: #f8f8f8;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        p {
+            font-size: 16px;
+            color: #555;
+            line-height: 1.6;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>🎭 [나름자리] 공연 좌석 예약이 완료되었습니다.</h2>
+        <p><strong>{{ name }}</strong>님, 안녕하세요.</p>
+        <p>고객님의 공연 좌석 예약이 정상적으로 완료되었습니다. 아래 정보를 확인해 주세요.</p>
+
+        <div class="info">
+            <p><strong>공연명:</strong> ??</p>
+            <p><strong>공연 일시:</strong> 2025년 2월 ??</p>
+            <p><strong>공연 장소:</strong> 광명시민회관</p>
+        </div>
+
+        <div class="info">
+            <p><strong>예약자:</strong> {{ name }}</p>
+            <p><strong>좌석 번호:</strong> {{ seat_label }}</p>
+        </div>
+
+        <p>🎟 <strong>공연 시작 10분 전까지 착석을 완료해 주세요.</strong></p>
+        <p>🖥️ 예약을 확인하고 싶다면 <a href="https://127.0.0.1:5724/check">나름자리 사이트</a>에서 확인해주세요!</p>
+        <p>📌 예약 변경 및 취소는 <strong>2025년 2월 18일(화)</strong>까지 가능합니다.</p>
+        <p>📞 문의 사항은 <strong>02-2060-1318</strong>으로 연락해주세요.</p>
+
+        <div class="footer">
+            <p>감사합니다!</p>
+            <p><strong>Cluster, Nareum</strong></p>
+            <p>clusterfriends@gmail.com | 02-2060-1318</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -29,34 +29,51 @@ def index():
 @app.route('/reserve', methods=['GET', 'POST'])
 def reserve():
     if request.method == 'POST':
+        print("🔹 Raw request data:", request.data)  # Check raw request
+        print("🔹 Form data:", request.form)  # Debug form data
+        print("🔹 Headers:", request.headers)  # Debug headers
+
+        if not request.form:
+            flash('No form data received!', 'danger')
+            return redirect(url_for('reserve'))
+        
+        print(request.form)
         seat_label = request.form['seat_label']
         name = request.form['name']
         email = request.form['email']
         phone = request.form['phone']
+        rooting_for = request.form['rooting_for']
+
+        if not seat_label or not name or not email or not phone:
+            flash('[!] 제대로 입력되지 않은 항목이 있습니다.', 'danger')
+            return redirect(url_for('reserve'))
 
         seat = Seat.query.filter_by(seat_label=seat_label, is_reserved=False).first()
         
         if not seat:
-            flash('Seat is already reserved or does not exist.', 'danger')
+            flash('[!] 좌석이 이미 예약되었거나, 이용할 수 없습니다.', 'danger')
             return redirect(url_for('reserve'))
         
-        new_reservation = Reservation(seat_id=seat.id, name=name, email=email, phone=phone)
+        prev_name_rev = Reservation.query.filter_by(name=name, is_active=True).first()
+        prev_email_rev = Reservation.query.filter_by(email=email, is_active=True).first()
+        prev_phone_rev = Reservation.query.filter_by(phone=phone, is_active=True).first()
+        if prev_name_rev or prev_email_rev or prev_phone_rev:
+            flash('[!] 이미 해당 정보로 좌석 신청 이력이 존재합니다.', 'danger')
+            return redirect(url_for('reserve'))
+        
+        new_reservation = Reservation(seat_id=seat.id, name=name, email=email, phone=phone, rooting_for=rooting_for)
         seat.is_reserved = True  # Mark seat as reserved
         db.session.add(new_reservation)
         db.session.commit()
 
-        # Send Email Notification
-        msg = Message('Seat Reservation Confirmation',
+        msg = Message(f"[나름자리] {name} 님의 좌석 예약이 완료되었습니다.",
                       sender='clusterfriends@gmail.com',
                       recipients=[email])
-        # msg.body = f"Hello {name},\n\nYour seat {seat_label} has been reserved successfully!"
-        msg.html = f"""
-            <p>Hello {name},</p><p>Your seat {seat_label} has been reserved successfully!</p>
-            <img src="https://housewarm.applied.moe/hoonpago_house_mobile.jpg" width=300 alt="Seat Map">
-        """
+        msg.html = render_template('reservation_email.html', name=name, seat_label=seat_label)
         mail.send(msg)
 
-        flash('Reservation successful! A confirmation email has been sent.', 'success')
+        print(f"Reservation successful! A confirmation email has been sent to {email}.")
+        flash('[!!] 예약이 성공했습니다. 입력한 이메일로 예약 완료 메일이 발송되었습니다.', 'success')
         return redirect(url_for('index'))
     
     seats = Seat.query.all()
