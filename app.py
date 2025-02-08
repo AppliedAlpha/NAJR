@@ -58,7 +58,7 @@ def reserve():
         prev_email_rev = Reservation.query.filter_by(email=email, is_active=True).first()
         prev_phone_rev = Reservation.query.filter_by(phone=phone, is_active=True).first()
         if prev_name_rev or prev_email_rev or prev_phone_rev:
-            flash('[!] 이미 해당 정보로 좌석 신청 이력이 존재합니다.', 'danger')
+            flash('[!] 이미 해당 정보로 좌석 예약 이력이 존재합니다.', 'danger')
             return redirect(url_for('reserve'))
         
         new_reservation = Reservation(seat_id=seat.id, name=name, email=email, phone=phone, rooting_for=rooting_for)
@@ -73,7 +73,7 @@ def reserve():
         mail.send(msg)
 
         print(f"Reservation successful! A confirmation email has been sent to {email}.")
-        flash('[!!] 예약이 성공했습니다. 이메일로 예약 완료 메일이 발송되었습니다.', 'success')
+        flash('[!!] 예약이 성공했습니다. 이메일로 예약 완료 메일이 발송되었습니다.\n메일이 보이지 않는다면 스팸메일함을 확인해주세요.', 'success')
         return redirect(url_for('index'))
     
     seats = Seat.query.all()
@@ -84,17 +84,19 @@ def reserve():
 @app.route('/check', methods=['GET', 'POST'])
 def check_reservation():
     if request.method == 'POST':
-        email = request.form['email']
+        name = request.form['name']
         phone = request.form['phone']
 
-        reservation = Reservation.query.filter_by(email=email, phone=phone, is_active=True).first()
+        reservation = Reservation.query.filter_by(name=name, phone=phone, is_active=True).first()
         if not reservation:
-            flash('No active reservation found with provided details.', 'danger')
+            flash('[!] 해당 정보로 존재하는 좌석 예약 이력이 없습니다.', 'danger')
             return redirect(url_for('check_reservation'))
 
-        return render_template('check_cancel.html', reservation=reservation)
+        seats = Seat.query.all()
+        return render_template('check_cancel.html', seats=seats, reservation=reservation)
 
-    return render_template('check_cancel.html', reservation=None)
+    seats = Seat.query.all()
+    return render_template('check_cancel.html', seats=seats, reservation=None)
 
 @app.route('/cancel/<int:reservation_id>', methods=['POST'])
 def cancel_reservation(reservation_id):
@@ -103,9 +105,9 @@ def cancel_reservation(reservation_id):
         reservation.is_active = False
         reservation.seat.is_reserved = False  # Mark seat as available again
         db.session.commit()
-        flash('Reservation canceled successfully.', 'success')
+        flash('[!!] 예약을 성공적으로 취소했습니다.', 'success')
     else:
-        flash('Reservation not found or already canceled.', 'danger')
+        flash('[!] 예약을 찾을 수 없거나 이미 취소되었습니다.', 'danger')
 
     return redirect(url_for('check_reservation'))
 

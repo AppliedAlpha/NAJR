@@ -132,6 +132,16 @@
             margin-top: 50px;
             margin-bottom: 50px;
         }
+
+        .req {
+            font-weight: bold;
+            color: red;
+        }
+
+        .mb-3 input::-webkit-input-placeholder {
+            opacity: 0.5;
+            color: #999;
+        }
     </style>
 </head>
 <script>
@@ -196,16 +206,16 @@
                     <input type="hidden" name="seat_label" id="seat_label">
                 </div>
                 <div class="mb-3">
-                    <label for="name" class="form-label">이름</label>
-                    <input type="text" name="name" id="name" class="form-control" required>
+                    <label for="name" class="form-label">이름 <span class="req">*</span></label>
+                    <input type="text" name="name" id="name" class="form-control" placeholder="이름" required>
                 </div>
                 <div class="mb-3">
-                    <label for="email" class="form-label">이메일 주소</label>
-                    <input type="email" name="email" id="email" class="form-control" required>
+                    <label for="email" class="form-label">이메일 주소 <span class="req">*</span></label>
+                    <input type="email" name="email" id="email" class="form-control" placeholder="이메일 주소" required>
                 </div>
                 <div class="mb-3">
-                    <label for="phone" class="form-label">전화번호</label>
-                    <input type="text" name="phone" id="phone" class="form-control" required>
+                    <label for="phone" class="form-label">전화번호 <span class="req">*</span></label>
+                    <input type="text" name="phone" id="phone" class="form-control" placeholder="전화번호" required>
                     <small class="text-danger d-none" id="phone-error">[!] 전화번호를 올바르게 숫자로만 입력해주세요.</small>
 
                     <script>
