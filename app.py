@@ -2,7 +2,14 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail, Message
 from models import db, Seat, Reservation
+from dotenv import load_dotenv
 import os
+import sys
+import io
+
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
+os.environ["PYTHONIOENCODING"] = "utf-8"
+load_dotenv()
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///seats.db'
@@ -34,7 +41,7 @@ def reserve():
         print("🔹 Headers:", request.headers)  # Debug headers
 
         if not request.form:
-            flash('No form data received!', 'danger')
+            flash('[!] 전송에 실패했습니다.', 'danger')
             return redirect(url_for('reserve'))
         
         print(request.form)
@@ -78,6 +85,7 @@ def reserve():
     
     seats = Seat.query.all()
     available_seats = len([seat for seat in seats if not seat.is_reserved])
+    flash('[!] 예약은 서비스 오픈 이후에 가능합니다.', 'danger')
     return render_template('reservation.html', available_seats=available_seats, seats=seats)
 
 # Check & Cancel Page
@@ -124,4 +132,4 @@ def cancel_reservation(reservation_id, is_admin):
 if __name__ == '__main__':
     with app.app_context():
         db.create_all() 
-    app.run(port=5724, debug=True)
+    app.run(debug=True)
