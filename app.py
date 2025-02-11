@@ -1,8 +1,9 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, abort
 from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail, Message
 from models import db, Seat, Reservation
 from dotenv import load_dotenv
+from datetime import datetime
 import os
 import sys
 import io
@@ -27,6 +28,23 @@ app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
 db.init_app(app)
 mail = Mail(app)
 
+# Health Check
+@app.route('/healthz')
+def healthz():
+	return "OK", 200
+	
+@app.route('/status', methods=['GET'])
+def status():
+    try:
+        status_code = int(request.args.get('id'))
+        
+        if 100 <= status_code <= 599:  # Valid HTTP status codes range
+            return '', status_code
+        else:
+            abort(404)
+    except (TypeError, ValueError):
+        abort(404)
+
 # Home Page (Title)
 @app.route('/')
 def index():
@@ -36,9 +54,9 @@ def index():
 @app.route('/reserve', methods=['GET', 'POST'])
 def reserve():
     if request.method == 'POST':
-        print("🔹 Raw request data:", request.data)  # Check raw request
-        print("🔹 Form data:", request.form)  # Debug form data
-        print("🔹 Headers:", request.headers)  # Debug headers
+        # print("Raw request data:", request.data)  # Check raw request
+        # print("Form data:", request.form)  # Debug form data
+        # print("Headers:", request.headers)  # Debug headers
 
         if not request.form:
             flash('[!] 전송에 실패했습니다.', 'danger')
@@ -79,13 +97,21 @@ def reserve():
         msg.html = render_template('reservation_email.html', name=name, seat_label=seat_label)
         mail.send(msg)
 
-        print(f"Reservation successful! A confirmation email has been sent to {email}.")
         flash('[!!] 예약이 성공했습니다. 이메일로 예약 완료 메일이 발송되었습니다.\n메일이 보이지 않는다면 스팸메일함을 확인해주세요.', 'success')
         return redirect(url_for('index'))
     
     seats = Seat.query.all()
     available_seats = len([seat for seat in seats if not seat.is_reserved])
-    flash('[!] 예약은 서비스 오픈 이후에 가능합니다.', 'danger')
+    
+    '''
+    current_time = datetime.now()
+    if current_time < datetime(2025, 2, 13, 0, 0, 0):
+        flash('[!] 예약은 서비스 오픈 이후에 가능합니다.', 'danger')
+        for seat in seats:
+            seat.is_reserved = True
+        available_seats = 0
+    '''
+    
     return render_template('reservation.html', available_seats=available_seats, seats=seats)
 
 # Check & Cancel Page
