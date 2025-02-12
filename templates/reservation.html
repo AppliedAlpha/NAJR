@@ -3,13 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>나름자리 [좌석 예약]</title>
+    <title>나인페 [좌석 예약]</title>
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     
     <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="static/image/png" href="static/favicon.ico">
 
     <style>
         body {
@@ -146,6 +149,17 @@
         .my-hidden {
             display: none;
         }
+        
+        table{ border-collapse : collapse; }  /*이중선 제거*/
+		th,td{
+    		text-align: left;
+    		border: 1px solid #000;
+    		padding: 10px;
+      
+    		vertical-align: top;	/* 위 */
+    		vertical-align: bottom;   /* 아래 */
+    		vertical-align: middle;   /* 가운데 */
+    	}
     </style>
 </head>
 <script>
@@ -246,12 +260,37 @@
                 </div>
                 <div class="mb-3">
                     <div class="scroll-box">
-                        <b>[개인정보 수집과 이용에 대한 동의]</b><br /><br />
-                        - 개인정보 수집 및 이용 목적 : 좌석 예약을 위한 개인정보 수집 및 이용<br />
-                        - 수집하는 개인정보 항목 : 이름, 이메일 주소, 전화번호<br />
-                        - 개인정보 보유 및 이용 기간 : 좌석 예약일로부터 90일간 보관 후 삭제<br />
-                        - 동의 거부 권리 : 귀하는 동의를 거부할 수 있으나, 동의하지 않을 시 좌석 예약이 불가능함을 알려드립니다.<br />
-                    </div>
+                        <b>[개인정보 수집·이용 동의서]</b><br><br>
+                        나름청소년활동센터는 귀하의 개인정보를 중요시하며, 개인정보 보호법 제15조 및<br>
+                        17조~19조, 제22조~24조에 따라 아래와 같이 동의를 얻고자 합니다.<br>
+                        아래 사항에 대해 충분히 읽어보신 후에 동의 여부를 체크해 주시기 바랍니다.<br><br>
+                        <p align="left"><b>■ 개인정보 수집 및 이용</b>
+                        	<table>
+    							<tr>
+    								<td><b>개인정보의 수집 및 이용 목적</b></td>
+    								<td>2025년 나름청소년활동센터 청소년어울마당 [나.인.페] 신청 및 활동</td>
+    							</tr>
+    							<tr>
+    								<td><b>개인정보의 보유 및 이용기간</b></td>
+    								<td>5년</td>
+    							</tr>
+    							<tr>
+    								<td><b>수집하려는 개인정보 항목</b></td>
+    								<td>이름, 연락처, 이메일, 활동사진</td>
+    							</tr>
+    							<tr>
+    								<td><b>동의거부 권리 및 동의거부에 따른 불이익 내용 또는 제한사항</b></td>
+    								<td>귀하는 개인정보를 제공하지 않을 수 있으며, 상기 개인정보 수집 및 이용에 동의하지 않을 수 있습니다. 다만, 상기 개인정보 중 필수항목은 프로그램 참여에 반드시 필요한 사항이므로 동의하지 않을 경우 제한받을 수 있습니다.</td>
+    							</tr>
+    						</table>
+                        </p>
+                        
+    					<table align="center">
+    						<td align="center">
+    							본인은 나름청소년활동센터 프로그램에 신청하기 위해 [개인정보보호법] 등 관련 법규에 의거하여 위와 같이 개인정보 수집 및 이용에 동의합니다.
+    						</td>
+    					</table>
+                	</div>
                 </div>
                 <div class="mb-3 form-check">
                     <input type="checkbox" name="consent" id="consent" class="form-check-input" required>

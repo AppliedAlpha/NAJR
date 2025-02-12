@@ -27,7 +27,7 @@ app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
 
 db.init_app(app)
 mail = Mail(app)
-SERVICE_NAME = "나인페스"
+SERVICE_NAME = "나름 Invitation Festival"
 
 # Health Check
 @app.route('/healthz')

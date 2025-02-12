@@ -3,20 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>나름자리 [예약 확인]</title>
+    <title>나인페 [예약 확인]</title>
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     
     <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="static/image/png" href="static/favicon.ico">
 
     <style>
         body {
             font-family: 'Nanum Gothic', sans-serif;
             text-align: center;
-            background: url("{{ url_for('static', filename='images/bg3.jpg') }}") no-repeat center center/cover;
+            background: url("{{ url_for('static', filename='images/bg06.jpg') }}") no-repeat center center/cover;
             position: relative;
+            height: 100vh;
         }
 
         .title {
@@ -33,6 +37,18 @@
             height: 100%;
             background: rgba(0, 0, 0, 0.5);
             z-index: -1;
+        }
+        
+        .total-box {
+        	position: fixed;
+        	top: 0;
+        	left: 0;
+        	width: 100%;
+        	height: 100%;
+        	
+        	display: flex;
+    		justify-content: center;
+    		align-items: center;
         }
 
         .content-box {
@@ -125,80 +141,81 @@
 </head>
 <body>
     <div class="overlay"></div>
-    <div class="ct-margin container content-box">
-        <button class="btn btn-danger" onclick="window.location.href='{{ url_for('index') }}'" style="display: flex; align-items: flex-start;">이전 화면으로</button>
-        <h1 class="title text-center">예약 확인/취소하기</h1>
-
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <div class="container mt-3">
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                {% endfor %}
-                </div>
-            {% endif %}
-        {% endwith %}
-
-        <div class="form-container">
-            <form method="POST">
-                <div class="mb-3 min-width">
-                    <label for="name" class="form-label">이름</label>
-                    <input type="text" name="name" id="name" class="form-control" required>
-                </div>
-                <div class="mb-3 min-width">
-                    <label for="phone" class="form-label">전화번호</label>
-                    <input type="text" name="phone" id="phone" class="form-control" required>
-                    <small class="text-danger d-none" id="phone-error">[!] 입력을 확인해주세요.</small>
-
-                    <script>
-                        document.getElementById("phone").addEventListener("input", function (event) {
-                            let input = this.value.replace(/\D/g, ""); // Remove non-numeric characters
-                            if (input.length > 12) input = input.slice(0, 12); // Limit to 12 digits
-                            this.value = input;
-                        
-                            // Validation message
-                            const errorMsg = document.getElementById("phone-error");
-                            if (input.length < 8 || input.length > 12) {
-                                errorMsg.classList.remove("d-none");
-                            } else {
-                                errorMsg.classList.add("d-none");
-                            }
-                        });
-                    </script>
-                </div>
-                <button type="submit" class="btn btn-success search-btn">예약 확인하기</button>
-            </form>
-        </div>
-    
-        {% if reservation %}
-        <div class="reservation-details">
-            <p><strong>좌석 번호:</strong><span class="seat-number"> {{ reservation.seat.seat_label }}</span></p>
-            <p><strong>이름:</strong> {{ reservation.name }}</p>
-            <p><strong>전화번호:</strong> {{ reservation.phone }}</p>
-            <p><strong>이메일:</strong> {{ reservation.email }}</p>
-            <p><strong>응원하는 아티스트:</strong> {{ reservation.rooting_for | default('-') }}</p>
-    
-            <form action="{{ url_for('cancel_reservation', reservation_id=reservation.id, is_admin=0) }}" method="POST">
-                <button type="submit" class="btn btn-danger">예약 취소</button>
-            </form>
-        </div>
-
-        <div class="seat-container">
-            <img src="{{ url_for('static', filename='images/seats.jpg') }}" alt="Seat Map" class="seat-map">
-            {% for seat in seats %}
-                <button class="seat {% if reservation.seat_id == seat.id %}selected{% else %}reserved{% endif %}" 
-                    data-seat="{{ seat.seat_label }}"
-                    style="top: {{ seat.y }}px; left: {{ seat.x }}px;">
-                    {{ seat.seat_label[2] }}-{{ seat.seat_label[5] }}
-                </button>
-            {% endfor %}
-        </div>
-        {% endif %}
-    </div>
-
+    <div class="total-box">
+	    <div class="ct-margin container content-box">
+	        <button class="btn btn-danger" onclick="window.location.href='{{ url_for('index') }}'" style="display: flex; align-items: flex-start;">이전 화면으로</button>
+	        <h1 class="title text-center">예약 확인/취소하기</h1>
+	
+	        {% with messages = get_flashed_messages(with_categories=true) %}
+	            {% if messages %}
+	                <div class="container mt-3">
+	                {% for category, message in messages %}
+	                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+	                    {{ message }}
+	                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+	                    </div>
+	                {% endfor %}
+	                </div>
+	            {% endif %}
+	        {% endwith %}
+	
+	        <div class="form-container">
+	            <form method="POST">
+	                <div class="mb-3 min-width">
+	                    <label for="name" class="form-label">이름</label>
+	                    <input type="text" name="name" id="name" class="form-control" required>
+	                </div>
+	                <div class="mb-3 min-width">
+	                    <label for="phone" class="form-label">전화번호</label>
+	                    <input type="text" name="phone" id="phone" class="form-control" required>
+	                    <small class="text-danger d-none" id="phone-error">[!] 입력을 확인해주세요.</small>
+	
+	                    <script>
+	                        document.getElementById("phone").addEventListener("input", function (event) {
+	                            let input = this.value.replace(/\D/g, ""); // Remove non-numeric characters
+	                            if (input.length > 12) input = input.slice(0, 12); // Limit to 12 digits
+	                            this.value = input;
+	                        
+	                            // Validation message
+	                            const errorMsg = document.getElementById("phone-error");
+	                            if (input.length < 8 || input.length > 12) {
+	                                errorMsg.classList.remove("d-none");
+	                            } else {
+	                                errorMsg.classList.add("d-none");
+	                            }
+	                        });
+	                    </script>
+	                </div>
+	                <button type="submit" class="btn btn-success search-btn">예약 확인하기</button>
+	            </form>
+	        </div>
+	    
+	        {% if reservation %}
+	        <div class="reservation-details">
+	            <p><strong>좌석 번호:</strong><span class="seat-number"> {{ reservation.seat.seat_label }}</span></p>
+	            <p><strong>이름:</strong> {{ reservation.name }}</p>
+	            <p><strong>전화번호:</strong> {{ reservation.phone }}</p>
+	            <p><strong>이메일:</strong> {{ reservation.email }}</p>
+	            <p><strong>응원하는 아티스트:</strong> {{ reservation.rooting_for | default('-') }}</p>
+	    
+	            <form action="{{ url_for('cancel_reservation', reservation_id=reservation.id, is_admin=0) }}" method="POST">
+	                <button type="submit" class="btn btn-danger">예약 취소</button>
+	            </form>
+	        </div>
+	
+	        <div class="seat-container">
+	            <img src="{{ url_for('static', filename='images/seats.jpg') }}" alt="Seat Map" class="seat-map">
+	            {% for seat in seats %}
+	                <button class="seat {% if reservation.seat_id == seat.id %}selected{% else %}reserved{% endif %}" 
+	                    data-seat="{{ seat.seat_label }}"
+	                    style="top: {{ seat.y }}px; left: {{ seat.x }}px;">
+	                    {{ seat.seat_label[2] }}-{{ seat.seat_label[5] }}
+	                </button>
+	            {% endfor %}
+	        </div>
+	        {% endif %}
+	    </div>
+	</div>
     <script>
         window.onload = function() {
             const container = document.querySelector(".seat-container");
