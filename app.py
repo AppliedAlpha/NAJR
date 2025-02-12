@@ -109,39 +109,41 @@ def reserve():
 @app.route("/verify", methods=['POST'])
 def verify():
     email = request.form.get("email")
-    
-    if email:
-        seat_label = request.form.get('seat_label')
-        name = request.form.get('name')
-        email = request.form.get('email')
-        phone = request.form.get('phone')
-        rooting_for = request.form.get('rooting_for')
 
-        if not seat_label or not name or not email or not phone:
-            return jsonify({"success": False, "message": "제대로 입력되지 않은 항목이 있습니다."})
+    try:
+        if email:
+            seat_label = request.form.get('seat_label')
+            name = request.form.get('name')
+            phone = request.form.get('phone')
+            rooting_for = request.form.get('rooting_for')
 
-        seat = Seat.query.filter_by(seat_label=seat_label, is_reserved=False).first()
-        
-        if not seat:
-            return jsonify({"success": False, "message": "좌석이 이미 예약되었거나, 이용할 수 없습니다."})
-        
-        prev_name_rev = Reservation.query.filter_by(name=name, is_active=True).first()
-        prev_email_rev = Reservation.query.filter_by(email=email, is_active=True).first()
-        prev_phone_rev = Reservation.query.filter_by(phone=phone, is_active=True).first()
-        
-        if prev_name_rev or prev_email_rev or prev_phone_rev:
-            return jsonify({"success": False, "message": "이미 해당 정보로 좌석 예약 이력이 존재합니다."})
-        
-        rnd_verify_num = seat.rnd_verify_num
-        msg = Message(f"[{SERVICE_NAME}] 이메일 인증 코드",
-                    sender='clusterfriends@gmail.com',
-                    recipients=[email])
-        msg.body = f"[{SERVICE_NAME}]\n\n안녕하세요, {name}님!\n\n현재 예약하려는 좌석은 \"{seat_label}\"입니다.\n\n인증 코드: {rnd_verify_num}\n이 코드를 예약 창에 입력하여 좌석 예약을 완료하세요.\n\n감사합니다!"
-        mail.send(msg)
+            if not seat_label or not name or not email or not phone:
+                return jsonify({"success": False, "message": "제대로 입력되지 않은 항목이 있습니다."})
 
-        return jsonify({"success": True, "message": "인증 이메일이 전송되었습니다."})
-    
-    return jsonify({"success": False, "message": "이메일이 유효하지 않습니다."})
+            seat = Seat.query.filter_by(seat_label=seat_label, is_reserved=False).first()
+            
+            if not seat:
+                return jsonify({"success": False, "message": "좌석이 이미 예약되었거나, 이용할 수 없습니다."})
+            
+            prev_name_rev = Reservation.query.filter_by(name=name, is_active=True).first()
+            prev_email_rev = Reservation.query.filter_by(email=email, is_active=True).first()
+            prev_phone_rev = Reservation.query.filter_by(phone=phone, is_active=True).first()
+            
+            if prev_name_rev or prev_email_rev or prev_phone_rev:
+                return jsonify({"success": False, "message": "이미 해당 정보로 좌석 예약 이력이 존재합니다."})
+            
+            rnd_verify_num = seat.rnd_verify_num
+            msg = Message(f"[{SERVICE_NAME}] 이메일 인증 코드",
+                        sender='clusterfriends@gmail.com',
+                        recipients=[email])
+            msg.body = f"[{SERVICE_NAME}]\n\n안녕하세요, {name}님!\n\n현재 예약하려는 좌석은 \"{seat_label}\"입니다.\n\n인증 코드: {rnd_verify_num}\n이 코드를 예약 창에 입력하여 좌석 예약을 완료하세요.\n\n감사합니다!"
+            mail.send(msg)
+
+            return jsonify({"success": True, "message": "인증 이메일이 전송되었습니다."})
+        
+        return jsonify({"success": False, "message": "이메일이 유효하지 않습니다."})
+    except Exception as err:
+        return jsonify({"success": False, "message": err})
 
 # Check & Cancel Page
 @app.route('/check', methods=['GET', 'POST'])
