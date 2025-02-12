@@ -142,6 +142,10 @@
             opacity: 0.5;
             color: #999;
         }
+
+        .my-hidden {
+            display: none;
+        }
     </style>
 </head>
 <script>
@@ -187,7 +191,7 @@
             {% endif %}
         {% endwith %}
 
-        <div class="seat-container">
+        <div class="seat-container {% if verifing %} hidden {% endif %}">
             <img src="{{ url_for('static', filename='images/seats.jpg') }}" alt="Seat Map" class="seat-map">
             {% for seat in seats %}
                 <button class="seat {% if seat.is_reserved %}reserved{% else %}available{% endif %}" 
@@ -198,22 +202,24 @@
             {% endfor %}
         </div>
 
-        <div class="form-container">
-            <form method="POST" onsubmit="showLoading(event)">
+        <form method="POST" onsubmit="onSubmit(event)" id="info">
+            <input type="hidden" name="method" id="method" value="A">
+
+            <div class="form-container">
                 <div class="mb-3">
                     <label for="seat_label" class="form-label" style="font-weight: bold">예약할 좌석 번호</label>
                     <div class="form-control" readonly id="seat_label_display" style="font-weight: bold; color: #4CAF50"></div>
                     <input type="hidden" name="seat_label" id="seat_label">
                 </div>
-                <div class="mb-3">
+                <div class="mb-3" style="width: 90%">
                     <label for="name" class="form-label">이름 <span class="req">*</span></label>
                     <input type="text" name="name" id="name" class="form-control" placeholder="이름" required>
                 </div>
-                <div class="mb-3">
+                <div class="mb-3" style="width: 90%">
                     <label for="email" class="form-label">이메일 주소 <span class="req">*</span></label>
                     <input type="email" name="email" id="email" class="form-control" placeholder="이메일 주소" required>
                 </div>
-                <div class="mb-3">
+                <div class="mb-3" style="width: 90%">
                     <label for="phone" class="form-label">전화번호 <span class="req">*</span></label>
                     <input type="text" name="phone" id="phone" class="form-control" placeholder="전화번호" required>
                     <small class="text-danger d-none" id="phone-error">[!] 전화번호를 올바르게 숫자로만 입력해주세요.</small>
@@ -234,7 +240,7 @@
                         });
                         </script>
                 </div>
-                <div class="mb-3">
+                <div class="mb-3" style="width: 90%">
                     <label for="rooting_for" class="form-label">응원하는 아티스트</label>
                     <input type="text" name="rooting_for" id="rooting_for" class="form-control">
                 </div>
@@ -251,15 +257,21 @@
                     <input type="checkbox" name="consent" id="consent" class="form-check-input" required>
                     <label for="consent" class="form-check-label">개인정보 수집과 이용에 동의합니다.</label>
                 </div>
-                <button type="submit" class="btn btn-success">좌석 예약하기</button>
-            </form>
-        </div>
+                <button type="submit" class="btn btn-primary" id="verify-btn">이메일 인증하기</button>
+            </div>
+
+            <div class="form-container my-hidden" id="verifing-form">
+                <p>입력하신 이메일로 인증번호를 발송하였습니다.<br />인증번호가 오지 않았다면 입력하신 이메일과, 이메일의 스팸메일함을 확인해주세요.<br />인증번호를 하단 창에 입력하고 예약 버튼을 눌러주세요.</p>
+                <input type="text" name="verifing_text" id="verifing_text" class="form-control">
+                <button type="submit" class="btn btn-success" style="margin-top: 20px">좌석 예약하기</button>
+            </div>
+        </form>
     </div>
     
     <!-- Loading Overlay -->
     <div id="loading-overlay">
         <div class="loading-spinner"></div>
-        <p>예약을 진행하는 중...</p>
+        <p id="loading-text">예약을 진행하는 중...</p>
     </div>
 
     <style>
@@ -297,22 +309,78 @@
     </style>
 
     <script>
-        function showLoading(event) {
-            console.log('showLoading');
+        async function onSubmit(event) {
+            event.preventDefault();
+
             let seat = document.getElementById('seat_label_display').innerText;
+            let form = document.getElementById("info");
+            let method = document.getElementById("method").value;
+            let formData = new FormData(form);
+
             if (!seat) {
-                alert('좌석을 선택해주세요.');
-                event.preventDefault(); // Stop form submission
+                alert('[!] 좌석을 선택해주세요.');
                 return false;
             }
 
-            let overlay = document.getElementById('loading-overlay');
-            overlay.style.display = 'flex';
-            console.log("Overlay should be visible now.");
+            if (method == "A") {
+                let overlay = document.getElementById('loading-overlay');
+                let loading_text = document.getElementById('loading-text');
+                loading_text.value = "인증 메일 보내는 중...";
+                overlay.style.display = 'flex';
 
-            setTimeout(() => {
-                document.querySelectorAll('input, button').forEach(el => el.disabled = true);
-            }, 150);
+                setTimeout(() => {
+                    document.querySelectorAll('input, button').forEach(el => el.disabled = true);
+                }, 150);
+
+                let response = await fetch("/verify", {
+                    method: "POST",
+                    body: formData
+                });
+
+                let result = await response.json();
+
+                overlay.style.display = 'none';
+                setTimeout(() => {
+                    document.querySelectorAll('input, button').forEach(el => el.disabled = false);
+                }, 150);
+
+                if (result.success) {
+                    document.getElementById("verifing-form").classList.remove("my-hidden")
+                    document.getElementById("method").value = "B";
+                    document.getElementById("verify-btn").classList.add("disabled")
+                    alert("[!] 인증 이메일이 발송되었습니다.");
+                } else {
+                    alert("[!] 인증 이메일 전송 실패: " + result.message);
+                }
+            } else if (method == "B") {
+                let overlay = document.getElementById('loading-overlay');
+                let loading_text = document.getElementById('loading-text');
+                loading_text.value = "예약을 진행하는 중...";
+                overlay.style.display = 'flex';
+
+                setTimeout(() => {
+                    document.querySelectorAll('input, button').forEach(el => el.disabled = true);
+                }, 150);
+
+                let response = await fetch("/reserve", {
+                    method: "POST",
+                    body: formData
+                });
+
+                let result = await response.json();
+
+                overlay.style.display = 'none';
+                setTimeout(() => {
+                    document.querySelectorAll('input, button').forEach(el => el.disabled = false);
+                }, 150);
+
+                if (result.success) {
+                    form.reset();
+                    window.location.href = "/";
+                } else {
+                    alert("[!] 예약 실패: " + result.message);
+                }
+            }            
         }
 
         window.onload = function() {

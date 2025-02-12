@@ -1,5 +1,6 @@
 from app import db, Seat, Reservation, app
 from datetime import datetime
+import random, string
 
 # Ensure operations run within the Flask application context
 with app.app_context():
@@ -32,7 +33,9 @@ with app.app_context():
             _x += region[seat_num[0]] + (int(seat_num[2][0]) - 1) * 39
             _y += 310 + (int(seat_num[1][0]) - 1) * 60
 
-            seat = Seat(seat_label=label, is_reserved=False, x=_x, y=_y)  # All seats start as available
+            _rnd_verify_num = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+
+            seat = Seat(seat_label=label, is_reserved=False, x=_x, y=_y, rnd_verify_num=_rnd_verify_num)  # All seats start as available
             db.session.add(seat)
 
     db.session.commit()

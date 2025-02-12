@@ -9,6 +9,7 @@ class Seat(db.Model):
     is_reserved = db.Column(db.Boolean, default=False)  # False = Available, True = Reserved
     x = db.Column(db.Integer)
     y = db.Column(db.Integer)
+    rnd_verify_num = db.Column(db.String(10), unique=True)
 
     def __repr__(self):
         return f"<Seat {self.seat_label}, Reserved: {self.status}>"
