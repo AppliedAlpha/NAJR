@@ -97,7 +97,7 @@ def reserve():
     
     current_time = datetime.now()
     if current_time < datetime(2025, 2, 13, 18, 0, 0):
-        flash('[!] 예약은 서비스 오픈 이후에 가능합니다.', 'danger')
+        flash('[!] 예약은 서비스 오픈(2월 13일 오후 6시) 이후에 가능합니다.', 'danger')
         for seat in seats:
             seat.is_reserved = True
         available_seats = 0

@@ -177,11 +177,12 @@
 		<br>
         <a href="{{ url_for('reserve') }}" class="btn btn-pink-warning btn-lg btn-custom">좌석 예약하기</a>
         <a href="{{ url_for('check_reservation') }}" class="btn btn-pink-warning btn-lg btn-custom">예약 확인/취소하기</a><!-- btn-success -->
-        <button class="btn btn-pink-warning btn-lg btn-custom" data-bs-toggle="modal" data-bs-target="#timetableModal">포스터 보기</button><!-- btn-primary -->
+        <button class="btn btn-pink-warning btn-lg btn-custom" data-bs-toggle="modal" data-bs-target="#timetableModal">행사 시간표 보기</button><!-- btn-primary -->
+        <button class="btn btn-pink-warning btn-lg btn-custom" data-bs-toggle="modal" data-bs-target="#posterModal">포스터 보기</button><!-- btn-primary -->
     </div>
     
     <!-- Poaster Modal -->
-    <div class="modal fade" id="timetableModal" tabindex="-1" aria-labelledby="timetableModalLabel" aria-hidden="true">
+    <div class="modal fade" id="posterModal" tabindex="-1" aria-labelledby="timetableModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -192,6 +193,26 @@
         			<img src="static/images/poster.png" alt="나인페 포스터" class="img-fluid">
                 </div>
                 <div class="modal-footer">
+                	<a  href="static/images/poster.png" download><button type="button" class="btn btn-secondary">다운로드</button></a>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Timetable Modal -->
+    <div class="modal fade" id="timetableModal" tabindex="-1" aria-labelledby="timetableModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="timetableModalLabel">행사 시간표</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+        			<img src="static/images/timetable.png" alt="나인페 시간표" class="img-fluid">
+                </div>
+                <div class="modal-footer">
+                	<a  href="static/images/timetable.png" download><button type="button" class="btn btn-secondary">다운로드</button></a>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
                 </div>
             </div>
