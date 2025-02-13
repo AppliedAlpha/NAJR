@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta property="og:title" content="{{ SERVICE_NAME }}">
-    <meta property="og:image" content="/static/images/bg1.jpg">
+    <meta property="og:image" content="/static/images/poster.png">
     <meta property="og:description" content="나름 Invitation Festival에 초대합니다!">
     <title>{{ SERVICE_NAME }}</title>
     
@@ -176,8 +176,8 @@
 
 		<br>
         <a href="{{ url_for('reserve') }}" class="btn btn-pink-warning btn-lg btn-custom">좌석 예약하기</a>
-        <a href="{{ url_for('check_reservation') }}" class="btn btn-success btn-lg btn-custom">예약 확인/취소하기</a>
-        <button class="btn btn-primary btn-lg btn-custom" data-bs-toggle="modal" data-bs-target="#timetableModal">포스터 보기</button>
+        <a href="{{ url_for('check_reservation') }}" class="btn btn-pink-warning btn-lg btn-custom">예약 확인/취소하기</a><!-- btn-success -->
+        <button class="btn btn-pink-warning btn-lg btn-custom" data-bs-toggle="modal" data-bs-target="#timetableModal">포스터 보기</button><!-- btn-primary -->
     </div>
     
     <!-- Poaster Modal -->

@@ -95,14 +95,12 @@ def reserve():
     seats = Seat.query.all()
     available_seats = len([seat for seat in seats if not seat.is_reserved])
     
-    '''
     current_time = datetime.now()
-    if current_time < datetime(2025, 2, 13, 0, 0, 0):
+    if current_time < datetime(2025, 2, 13, 18, 0, 0):
         flash('[!] 예약은 서비스 오픈 이후에 가능합니다.', 'danger')
         for seat in seats:
             seat.is_reserved = True
         available_seats = 0
-    '''
     
     return render_template('reservation.html', available_seats=available_seats, seats=seats)
 
