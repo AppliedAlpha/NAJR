@@ -95,14 +95,12 @@ def reserve():
     seats = Seat.query.all()
     available_seats = len([seat for seat in seats if not seat.is_reserved])
     
-    '''
     current_time = datetime.now()
-    if current_time < datetime(2025, 2, 13, 0, 0, 0):
+    if current_time < datetime(2025, 2, 13, 18, 0, 0):
         flash('[!] 예약은 서비스 오픈 이후에 가능합니다.', 'danger')
         for seat in seats:
             seat.is_reserved = True
         available_seats = 0
-    '''
     
     return render_template('reservation.html', available_seats=available_seats, seats=seats)
 
@@ -133,10 +131,10 @@ def verify():
                 return jsonify({"success": False, "message": "이미 해당 정보로 좌석 예약 이력이 존재합니다."})
             
             rnd_verify_num = seat.rnd_verify_num
-            msg = Message(f"[{SERVICE_NAME}] 이메일 인증 코드",
+            msg = Message(f"[나·인·페] 이메일 인증 코드",
                         sender='clusterfriends@gmail.com',
                         recipients=[email])
-            msg.body = f"[{SERVICE_NAME}]\n\n안녕하세요, {name}님!\n\n현재 예약하려는 좌석은 \"{seat_label}\"입니다.\n\n인증 코드: {rnd_verify_num}\n이 코드를 예약 창에 입력하여 좌석 예약을 완료하세요.\n\n감사합니다!"
+            msg.body = f"[나·인·페]\n\n안녕하세요, {name}님!\n\n현재 예약하려는 좌석은 \"{seat_label}\"입니다.\n\n인증 코드: {rnd_verify_num}\n이 코드를 예약 창에 입력하여 좌석 예약을 완료하세요.\n\n감사합니다!"
             mail.send(msg)
 
             return jsonify({"success": True, "message": "인증 이메일이 전송되었습니다."})

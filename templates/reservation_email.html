@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>[나.인.페] {{ name }} 님의 좌석 예약이 완료되었습니다.</title>
+    <title>[나·인·페] {{ name }} 님의 좌석 예약이 완료되었습니다.</title>
     
     <!-- Favicon -->
     <link rel="icon" type="static/image/png" href="static/favicon.ico">
@@ -27,16 +27,20 @@
             color: #333;
             text-align: center;
         }
-        .info {
+        .info, .guidelines {
             background: #f8f8f8;
             padding: 15px;
             border-radius: 8px;
-            margin: 10px 0;
+            margin: 15px 0;
         }
         p {
             font-size: 16px;
             color: #555;
             line-height: 1.6;
+        }
+        .seat-number {
+            font-weight: bold;
+            color: blue;
         }
         .footer {
             text-align: center;
@@ -44,21 +48,25 @@
             font-size: 14px;
             color: #888;
         }
-        .seat-number {
-            font-weight: 700;
-            color: blue;
+        .image-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .image-container img {
+            max-width: 100%;
+            border-radius: 10px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>ߎ나름자리] 공연 좌석 예약이 완료되었습니다.</h2>
+        <h2>[나·인·페] 2025 Nareum Invitation Festival 예약 완료</h2>
         <p><strong>{{ name }}</strong>님, 안녕하세요.</p>
         <p>고객님의 공연 좌석 예약이 정상적으로 완료되었습니다. 아래 정보를 확인해 주세요.</p>
 
         <div class="info">
-            <p><strong>공연명:</strong> ??</p>
-            <p><strong>공연 일시:</strong> 2025년 2월 ??</p>
+            <p><strong>공연명:</strong> 2025 나·인·페 (2025 Nareum Invitation Festival)</p>
+            <p><strong>공연 일시:</strong> 2025년 2월 27일 (목요일)</p>
             <p><strong>공연 장소:</strong> 광명시민회관</p>
         </div>
 
@@ -67,10 +75,27 @@
             <p><strong>좌석 번호:</strong><span class="seat-number"> {{ seat_label }}</span></p>
         </div>
 
-        <p>ߎstrong>공연 시작 10분 전까지 착석을 완료해 주세요.</strong></p>
-        <p>ߖ寸般彬턠확인하고 싶다면 <a href="https://127.0.0.1:5724/check">나름자리 사이트</a>에서 확인해주세요!</p>
-        <p>ߓ젬般彠변경 및 취소는 <strong>2025년 2월 18일(화)</strong>까지 가능합니다.</p>
-        <p>ߓ츬혠사항은 <strong>02-2060-1318</strong>으로 연락해주세요.</p>
+        <div class="guidelines">
+            <h3>공연 관람 안내</h3>
+            <ul>
+                <li><strong>입장 시간 준수:</strong> 공연 시작 <strong>30분 전</strong>까지 입장해 주세요. 늦을 경우, 공연 중간에 입장이 제한될 수 있습니다.</li>
+                <li><strong>휴대폰 사용 금지:</strong> 공연 중에는 휴대폰을 꺼두시거나 비행기 모드로 설정해 주세요. 플래시 촬영 및 녹음은 금지됩니다.</li>
+                <li><strong>음식 및 음료 반입 금지:</strong> 공연장 내에서는 음식과 음료 반입이 금지되어 있습니다. 공연 전에 미리 섭취해 주세요.</li>
+                <li><strong>소음 최소화:</strong> 공연 중에는 대화나 소음을 최소화하여 다른 관객들이 공연을 즐길 수 있도록 협조 부탁드립니다.</li>
+                <li><strong>좌석 확인:</strong> 자신의 좌석 번호를 확인한 후, 지정된 자리에서 관람해 주세요.</li>
+                <li><strong>안전 수칙 준수:</strong> 비상 상황 발생 시, 안내 직원의 지시에 따라 안전하게 대피해 주세요.</li>
+                <li><strong>주차 및 대중교통 이용:</strong> 공연장 주변 주차 공간이 부족할 수 있으므로, 대중교통 이용을 권장합니다.</li>
+                <li><strong>좌석 번호 행운권 추첨:</strong> 공연 중 행운권 추첨이 예정되어 있으니, 티켓을 꼭 소지해 주세요.</li>
+            </ul>
+        </div>
+
+        <p>좌석 정보나 위치를 확인하고 싶다면 <a href="https://nareum.life/check">예약 사이트</a>에서 확인해주세요!</p>
+        <p>예약 변경 및 취소는 <strong>2025년 2월 18일(화)</strong>까지 가능합니다.</p>
+        <p>문의 사항은 <strong>02-2060-1318</strong>으로 연락해주세요.</p>
+
+        <div class="image-container">
+            <img src="static/images/poster.png" width="50%" height="auto" alt="2025 나·인·페 포스터">
+        </div>
 
         <div class="footer">
             <p>감사합니다!</p>
