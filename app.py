@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, abort, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, abort, jsonify, Response
 from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail, Message
 from models import db, Seat, Reservation
@@ -7,6 +7,8 @@ from datetime import datetime
 import os
 import sys
 import io
+import csv
+from io import StringIO
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
 os.environ["PYTHONIOENCODING"] = "utf-8"
@@ -123,11 +125,10 @@ def verify():
             if not seat:
                 return jsonify({"success": False, "message": "좌석이 이미 예약되었거나, 이용할 수 없습니다."})
             
-            prev_name_rev = Reservation.query.filter_by(name=name, is_active=True).first()
             prev_email_rev = Reservation.query.filter_by(email=email, is_active=True).first()
             prev_phone_rev = Reservation.query.filter_by(phone=phone, is_active=True).first()
             
-            if prev_name_rev or prev_email_rev or prev_phone_rev:
+            if prev_email_rev or prev_phone_rev:
                 return jsonify({"success": False, "message": "이미 해당 정보로 좌석 예약 이력이 존재합니다."})
             
             rnd_verify_num = seat.rnd_verify_num
@@ -183,6 +184,37 @@ def cancel_reservation(reservation_id, is_admin):
         return render_template('rev_list.html', seats=seats, reservations=reservations)
     
     return redirect(url_for('check_reservation'))
+
+@app.route("/download_reservations")
+def download_reservations():
+    try:
+        reservations = Reservation.query.filter_by(is_active=True).all()
+	    
+        output = StringIO()
+        csv_writer = csv.writer(output, quoting=csv.QUOTE_MINIMAL)
+
+        output.write("\ufeff")  
+        csv_writer.writerow(["좌석 번호", "이름", "핸드폰", "이메일", "응원하는 아티스트"])
+
+        # Write Data
+        for res in reservations:
+            seat = Seat.query.filter_by(id=res.seat_id).first()
+
+            if not seat:
+                continue
+
+            csv_writer.writerow([seat.seat_label, res.name, str(res.phone), res.email, res.rooting_for or "-"])
+	
+        output.seek(0)
+        return Response(
+	        output.getvalue(),
+	        mimetype="text/csv",
+	        headers={"Content-Disposition": "attachment; filename=reservations.csv"}
+        )
+	    
+    except Exception as err:
+        print(err)
+        return Response(str(err), status=500)
 
 if __name__ == '__main__':
     with app.app_context():
